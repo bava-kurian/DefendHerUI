@@ -1,12 +1,16 @@
 package com.example.defendher_ui // Replace with your actual package name
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.PaddingValues
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,6 +40,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AppNavigation(fusedLocationClient: FusedLocationProviderClient) {
     val navController = rememberNavController()
@@ -46,6 +51,9 @@ fun AppNavigation(fusedLocationClient: FusedLocationProviderClient) {
         }
         composable(Screen.TravelTrackerScreen.route) {
             TravelTrackerScreen(fusedLocationClient = fusedLocationClient)
+        }
+        composable("map_screen") {
+            MapViewMain(PaddingValues(0.dp), navController)
         }
     }
 }
