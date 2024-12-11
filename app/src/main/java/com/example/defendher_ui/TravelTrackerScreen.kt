@@ -7,6 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,13 +19,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
 @Composable
-fun TravelTrackerScreen(fusedLocationClient: FusedLocationProviderClient) {
+fun TravelTrackerScreen(fusedLocationClient: FusedLocationProviderClient,navController: NavHostController) {
     val context = LocalContext.current
 
     // State Variables
@@ -75,36 +79,36 @@ fun TravelTrackerScreen(fusedLocationClient: FusedLocationProviderClient) {
             onModeSelected = { mode ->
                 selectedTravelMode = mode
                 travelDetails = "" // Reset details when mode changes
-                companionName = "" // Reset companion when walking is not selected
+                companionName = "" // Reset companion when mode is not "Walk"
             }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Conditional UI Input for travel details
+        // Conditional UI Input for travel details or companion name
         when (selectedTravelMode) {
-            "Car", "Auto", "Bike", "Walk" -> {
+            "Walk" -> {
+                // Text box for entering companion name when in "Walk" mode
                 OutlinedTextField(
-                    value = travelDetails,
-                    onValueChange = { travelDetails = it },
-                    label = { Text("Enter Travel Details") },
+                    value = companionName,
+                    onValueChange = { companionName = it },
+                    label = { Text("Companion Name (Optional)") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
                 )
             }
-        }
-
-        // Companion input only for "Walk" mode
-        if (selectedTravelMode == "Walk") {
-            OutlinedTextField(
-                value = companionName,
-                onValueChange = { companionName = it },
-                label = { Text("Companion Name (Optional)") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
+            "Car", "Auto", "Bike","Cab" -> {
+                // Text box for entering travel details for "Car", "Auto", or "Bike"
+                OutlinedTextField(
+                    value = companionName,
+                    onValueChange = { companionName = it },
+                    label = { Text("Travel Details") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -137,6 +141,7 @@ fun TravelTrackerScreen(fusedLocationClient: FusedLocationProviderClient) {
                     Toast.makeText(context, "Please set a destination on the map", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "Submitted!", Toast.LENGTH_SHORT).show()
+                    navController.navigate(Screen.TrackingOnScreen.route)
                     // Handle submission logic here
                 }
             },
@@ -163,7 +168,15 @@ fun TransportModeDropdown(selectedMode: String, onModeSelected: (String) -> Unit
             label = { Text("Select Transport Mode") },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true }
+                .clickable { expanded = true },
+            trailingIcon = {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Dropdown Icon"
+                    )
+                }
+            }
         )
 
         DropdownMenu(
