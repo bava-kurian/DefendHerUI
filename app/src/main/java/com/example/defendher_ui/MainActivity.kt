@@ -16,6 +16,7 @@ import com.example.defendher_ui.ui.theme.DefendHerTheme
 sealed class Screen(val route: String) {
     object MainScreen : Screen("main_screen")
     object TravelTrackerScreen : Screen("travel_tracker_screen")
+    object TrackingOnScreen: Screen("tracking_on_screen")
 }
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +46,10 @@ fun AppNavigation(fusedLocationClient: FusedLocationProviderClient) {
             MainScreen(navController)
         }
         composable(Screen.TravelTrackerScreen.route) {
-            TravelTrackerScreen(fusedLocationClient = fusedLocationClient)
+            TravelTrackerScreen(fusedLocationClient = fusedLocationClient,navController)
+        }
+        composable(Screen.TrackingOnScreen.route) {
+            TrackingOnScreen(navController)
         }
     }
 }
